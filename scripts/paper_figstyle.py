@@ -38,10 +38,49 @@ alone.
 from __future__ import annotations
 
 import re
+import os
 import subprocess
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
+
+
+def _register_paper_fonts() -> str:
+    """Use the official VLDB template's Linux Libertine O family in every plot.
+
+    Set NORA_PAPER_FONT_DIR on a machine without a discoverable TeX Live
+    installation. Register all four faces explicitly so labels, math, and bold
+    or italic annotations cannot silently fall back to DejaVu.
+    """
+    configured = os.environ.get("NORA_PAPER_FONT_DIR")
+    if configured:
+        font_dir = Path(configured)
+    else:
+        try:
+            regular = subprocess.check_output(
+                ["kpsewhich", "LinLibertine_R.otf"], text=True
+            ).strip()
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            regular = ""
+        if not regular:
+            raise RuntimeError(
+                "Linux Libertine O fonts not found; set NORA_PAPER_FONT_DIR "
+                "to the directory containing LinLibertine_*.otf."
+            )
+        font_dir = Path(regular).parent
+    for filename in ("LinLibertine_R.otf", "LinLibertine_RB.otf",
+                     "LinLibertine_RI.otf", "LinLibertine_RBI.otf"):
+        path = font_dir / filename
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        font_manager.fontManager.addfont(str(path))
+    return font_manager.FontProperties(
+        fname=str(font_dir / "LinLibertine_R.otf")
+    ).get_name()
+
+
+PAPER_FONT_FAMILY = _register_paper_fonts()
 
 # --------------------------------------------------------------------------- #
 # insertion widths (measured from the manuscript)
@@ -85,7 +124,16 @@ def scaled_rc(scale: float, targets: dict | None = None) -> dict:
     """rcParams with every absolute font size = target * scale."""
     t = {**TARGETS, **(targets or {})}
     return {
-        "font.family": "serif",
+        "font.family": PAPER_FONT_FAMILY,
+        "font.serif": [PAPER_FONT_FAMILY],
+        "mathtext.fontset": "custom",
+        "mathtext.rm": PAPER_FONT_FAMILY,
+        "mathtext.it": f"{PAPER_FONT_FAMILY}:italic",
+        "mathtext.bf": f"{PAPER_FONT_FAMILY}:bold",
+        "mathtext.bfit": f"{PAPER_FONT_FAMILY}:bold:italic",
+        "mathtext.sf": PAPER_FONT_FAMILY,
+        "mathtext.tt": PAPER_FONT_FAMILY,
+        "mathtext.fallback": "stix",
         "font.size": t["label"] * scale,
         "axes.labelsize": t["label"] * scale,
         "axes.titlesize": t["title"] * scale,

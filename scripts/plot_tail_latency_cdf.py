@@ -190,7 +190,7 @@ def _plot(scale: float = 1.0) -> tuple[plt.Figure, np.ndarray]:
     # Native double-column canvas: page width == 7.00 in insertion width, so
     # the point sizes below are the effective on-page sizes (no compensation).
     fig, axes = plt.subplots(len(ROWS), len(DATASETS),
-                             figsize=(DOUBLE_COL_IN, 2.62), squeeze=False)
+                             figsize=(DOUBLE_COL_IN, 2.42), squeeze=False)
     # every panel keeps the paper subplot aspect (1.2:1); the saved PDF is
     # measured by scripts/verify_subplot_aspects.py
     lock_aspect(axes.ravel())
@@ -244,8 +244,6 @@ def _plot(scale: float = 1.0) -> tuple[plt.Figure, np.ndarray]:
             ax.tick_params(axis="x", which="major", labelsize=d["tick"])
             if r == 0:
                 ax.set_title(title, pad=1.5 * scale, fontsize=d["title"])
-            if r == len(ROWS) - 1:
-                ax.set_xlabel("Latency ($\\mu$s)", labelpad=1.0 * scale)
             if c == 0:
                 # distinguish the two rows by axis name: the top row is the
                 # delete-latency CDF, the bottom row the query-latency CDF.
@@ -268,7 +266,9 @@ def _plot(scale: float = 1.0) -> tuple[plt.Figure, np.ndarray]:
     # No in-figure footnote any more: the measurement-window and truncation
     # notes moved to the manuscript body.  The freed bottom band is given back
     # to the panels and the canvas height is reduced accordingly.
-    fig.tight_layout(rect=(0.0, 0.02, 1.0, 0.935), w_pad=0.18, h_pad=0.4)
+    fig.tight_layout(rect=(0.0, 0.075, 1.0, 0.935), w_pad=0.18, h_pad=0.4)
+    fig.supxlabel("Latency ($\\mu$s)", x=0.52, y=0.02,
+                  fontsize=d["label"])
     return fig, axes
 
 

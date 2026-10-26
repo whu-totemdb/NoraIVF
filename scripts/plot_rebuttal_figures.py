@@ -91,7 +91,7 @@ NROWS, NCOLS = 1, 7
 FRONTIER_H_IN = 1.19
 # Single-row 4-panel L-sweep strip: panels + two-line titles + the
 # two-row dataset legend + the x ticks.
-LIRE_H_IN = 1.32
+LIRE_H_IN = 1.42
 # Panel titles here are one step below TARGETS["title"] (8.0): these are the
 # narrowest panels in the paper (0.587 in), and at 8.0 pt even the abbreviated
 # names dominated the panel.
@@ -355,7 +355,6 @@ def build_lire_l_sweep_1M(scale: float) -> plt.Figure:
         # ("10^6") above the axes frame, and with single-line titles there is
         # room between the legend and the axes to clear it.
         ax.set_title(title, pad=3.0 * scale, fontsize=f_title)
-        ax.set_xlabel("L", labelpad=0.4 * scale, fontsize=f_label)
         # The single-row strip has no room for four rotated y-axis labels; the
         # panel title already names the quantity and its unit, so only the y
         # tick numbers are printed.  ``ylabel`` stays in LIRE_PANELS for
@@ -423,10 +422,12 @@ def build_lire_l_sweep_1M(scale: float) -> plt.Figure:
     # panel width is set by the slot height, and tight_layout left ~0.31 in of
     # dead gutter between panels (0.52 in panels on a 3.34 in canvas).  These
     # numbers put a 0.645 in panel (0.5375 in tall at 1.2:1) in each slot,
-    # 0.186 in gutter for the neighbouring y-tick numbers, 0.24 in below the
-    # axes for the L ticks + label and 0.52 in above for titles + legend.
-    fig.subplots_adjust(left=0.072, right=0.986, top=0.568, bottom=0.196,
+    # 0.186 in gutter for the neighbouring y-tick numbers. Reserve an extra
+    # 0.10 in below the axes for the shared label, preserving panel size.
+    fig.subplots_adjust(left=0.072, right=0.986, top=0.5984, bottom=0.2526,
                         wspace=0.40)
+    fig.supxlabel("LIRE repair neighborhood size", x=0.529, y=0.008,
+                  fontsize=f_label)
     return fig
 
 

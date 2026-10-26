@@ -207,7 +207,9 @@ def build_latency_stability_1M(scale: float) -> plt.Figure:
                columnspacing=0.8, handlelength=1.4, handletextpad=0.35)
     # shared x label: the axis is identical for the three panels of a row
     fig.supxlabel("Index size (M)", y=0.045, fontsize=d["label"])
-    fig.tight_layout(rect=(0, 0.075, 1, 0.905), w_pad=0.35, h_pad=0.25,
+    # Reserve enough row separation for the bottom/top log tick labels. Their
+    # superscripts otherwise collide at the shared boundary after typesetting.
+    fig.tight_layout(rect=(0, 0.075, 1, 0.905), w_pad=0.35, h_pad=1.0,
                      pad=0.4)
     return fig
 
